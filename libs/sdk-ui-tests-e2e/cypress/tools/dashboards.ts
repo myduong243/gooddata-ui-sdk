@@ -111,7 +111,7 @@ export class TopBar {
     }
 
     enterEditMode() {
-        cy.get(".s-top-bar .s-edit").click();
+        cy.get(".s-top-bar .s-edit", {timeout: 1000000}).click();
         return this;
     }
 

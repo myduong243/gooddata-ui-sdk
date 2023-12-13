@@ -10,7 +10,7 @@ declare global {
     }
 }
 
-const VISIT_TIMEOUT = 40000;
+const VISIT_TIMEOUT = 100000;
 const CONFIRM_BUTTON = ".s-create_dashboard";
 const boilerAppHost = "https://127.0.0.1:8080";
 

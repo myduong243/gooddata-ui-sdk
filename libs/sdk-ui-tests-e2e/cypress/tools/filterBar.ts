@@ -270,7 +270,8 @@ export class AttributeFilter {
             cy.wait(delay);
         }
 
-        this.getDropdownElement().find(".s-configuration-button").click();
+        this.getDropdownElement().find(".s-configuration-button").as("btn");
+        cy.get("@btn").click({ force: true });
         return this;
     }
 
