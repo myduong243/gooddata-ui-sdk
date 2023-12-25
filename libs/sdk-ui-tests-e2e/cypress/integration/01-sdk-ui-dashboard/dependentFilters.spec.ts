@@ -7,6 +7,8 @@ import { Table } from "../../tools/table";
 const regionFilter = new AttributeFilter("Region");
 const stateFilter = new AttributeFilter("State");
 const cityFilter = new AttributeFilter("City");
+const product = new AttributeFilter("Product");
+const stageName = new AttributeFilter("Stage Name");
 const table = new Table(".s-dash-item-0");
 const topBar = new TopBar();
 
@@ -220,95 +222,77 @@ describe("Dependent filter", () => {
         cityFilter.isLoaded().open().hasSubtitle("All").hasFilterListSize(287);
     });
 
-    it("one child has two parents filter", { tags: "checklist_integrated_tiger" }, () => {
+    it(
+        "should test a circle parent - child filter in edit mode",
+        { tags: "checklist_integrated_tiger" },
+        () => {
+            topBar.enterEditMode().editButtonIsVisible(false);
+            stateFilter
+                .isLoaded()
+                .open()
+                .hasSubtitle("All")
+                .configureDependency("City")
+                .hasFilterListSize(48)
+                .selectAttribute(["Connecticut"])
+                .apply();
+
+            cityFilter
+                .open()
+                .elementsAreLoaded()
+                .hasFilterListSize(6)
+                .selectAttribute(["Bridgeport"])
+                .apply();
+
+            stateFilter
+                .open()
+                .elementsAreLoaded()
+                .hasFilterListSize(1)
+                .showAllElementValuesIsVisible(true)
+                .showAllElementValues()
+                .close();
+
+            stateFilter.open().elementsAreLoaded().showAllElementValuesIsVisible(true);
+            table.waitLoaded().getColumnValues(2).should("deep.equal", ["Bridgeport"]);
+            // topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
+        },
+    );
+
+    it(
+        "child filter can reduce to zero element by parent filter",
+        { tags: "checklist_integrated_tiger" },
+        () => {
+            topBar.enterEditMode().editButtonIsVisible(false);
+
+            product.open().elementsAreLoaded().selectAttribute(["TouchAll"]).apply();
+
+            stageName.open().elementsAreLoaded().hasNoRelevantMessage().showAllElementValuesIsVisible(true);
+
+            table.isEmpty();
+            // topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
+        },
+    );
+
+    it("can reload elements after unchecking parent filter", { tags: "checklist_integrated_tiger" }, () => {
         topBar.enterEditMode().editButtonIsVisible(false);
-        cityFilter.open().elementsAreLoaded().configureDependency("Region");
-        stateFilter.selectAttribute(["Connecticut", "Colorado"]).apply();
-        cityFilter.open().elementsAreLoaded().hasFilterListSize(2).selectAttribute(["Hartford"]).apply();
-        table.waitLoaded().getColumnValues(2).should("deep.equal", ["Hartford"]);
-        topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
+
+        stateFilter.open().selectAttribute(["Connecticut"]).apply();
+        cityFilter
+            .open()
+            .elementsAreLoaded()
+            .hasFilterListSize(6)
+            .configureDependency("State")
+            .elementsAreLoaded()
+            .hasFilterListSize(287);
+        // topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
     });
 
-    // it(
-    //     "one parent has one child and has one child of child filter",
-    //     { tags: "checklist_integrated_tiger" },
-    //     () => {
-    //         topBar.enterEditMode().editButtonIsVisible(false);
-    //         stateFilter
-    //             .open()
-    //             .elementsAreLoaded()
-    //             .configureDependency("Region")
-    //             .hasFilterListSize(7)
-    //             .selectAttribute(["Oregon", "New York"])
-    //             .apply();
-    //         cityFilter
-    //             .open()
-    //             .elementsAreLoaded()
-    //             .hasFilterListSize(16)
-    //             .selectAttribute(["New York", "Portland"])
-    //             .apply();
-    //         table.waitLoaded().getColumnValues(2).should("deep.equal", ["New York", "Portland"]);
-    //         topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
-    //     },
-    // );
+    it("can reload elements after removing parent filter", { tags: "checklist_integrated_tiger" }, () => {
+        topBar.enterEditMode().editButtonIsVisible(false);
 
-    // it("one parent has multiple child filters", { tags: "checklist_integrated_tiger" }, () => {
-    //     topBar.enterEditMode().editButtonIsVisible(false);
-    //     stateFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .configureDependency("Region")
-    //         .hasFilterListSize(7)
-    //         .selectAttribute(["Connecticut", "Massachusetts"])
-    //         .apply();
-    //     cityFilter.open().elementsAreLoaded().hasFilterListSize(10).configureDependency(["State", "Region"]);
-    //     // there is an issue after update dependency config, list of element doesn't update (not create the ticket yet)
-    //     cityFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .hasFilterListSize(9)
-    //         .selectAttribute(["Boston", "Bridgeport"])
-    //         .apply();
-    //     table.waitLoaded().getColumnValues(2).should("deep.equal", ["Bridgeport", "Boston"]);
-    //     topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
-    // });
-
-    // it("circle relationships", { tags: "checklist_integrated_tiger" }, () => {
-    //     topBar.enterEditMode().editButtonIsVisible(false);
-    //     stateFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .configureDependency("City")
-    //         .hasFilterListSize(48)
-    //         .selectAttribute(["Alabama", "Alaska"])
-    //         .apply();
-    //     cityFilter.open().elementsAreLoaded().hasFilterListSize(6);
-    //     table.waitLoaded().isEmpty();
-    //     topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
-    // });
-
-    // it("complex parent-child filter config", { tags: "checklist_integrated_tiger" }, () => {
-    //     topBar.enterEditMode().editButtonIsVisible(false);
-    //     stateFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .configureDependency(["Region", "City"])
-    //         .selectAttribute(["Connecticut", "Massachusetts"])
-    //         .apply();
-    //     cityFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .configureDependency("Region")
-    //         .hasFilterListSize(3)
-    //         .selectAttribute(["Boston"])
-    //         .apply();
-    //     stateFilter
-    //         .open()
-    //         .elementsAreLoaded()
-    //         .hasFilterListSize(1)
-    //         .clearIrrelevantElementValuesIsVisible(true)
-    //         .showAllElementValuesIsVisible(true);
-    //     table.waitLoaded().getColumnValues(2).should("deep.equal", ["Boston"]);
-    //     topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
-    // });
+        stateFilter.open().selectAttribute(["Connecticut"]).apply();
+        cityFilter.open().elementsAreLoaded().hasFilterListSize(6);
+        stateFilter.removeFilter();
+        cityFilter.open().elementsAreLoaded().hasFilterListSize(287);
+        // topBar.cancelEditMode().discardChanges().editButtonIsVisible(true);
+    });
 });
