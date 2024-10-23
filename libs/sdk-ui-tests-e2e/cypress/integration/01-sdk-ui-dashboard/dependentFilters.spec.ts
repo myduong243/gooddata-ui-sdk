@@ -36,7 +36,11 @@ describe("Dependent filter", () => {
 
         stateFilter.isLoaded().open().selectAttribute(["Connecticut"]).apply();
 
-        table.waitLoaded().getColumnValues(2).should("deep.equal", ["Bridgeport", "Hartford"]);
+        table
+            .waitLoadStarted()
+            .waitLoaded()
+            .getColumnValues(2)
+            .should("deep.equal", ["Bridgeport", "Hartford"]);
 
         cityFilter
             .isLoaded()
@@ -54,7 +58,7 @@ describe("Dependent filter", () => {
             .isLoaded()
             .hasSubtitle("Hartford");
 
-        table.waitLoaded().getColumnValues(2).should("deep.equal", ["Hartford"]);
+        table.waitLoadStarted().waitLoaded().getColumnValues(2).should("deep.equal", ["Hartford"]);
 
         stateFilter.open().selectAttribute(["Oregon"]).apply();
 
@@ -100,9 +104,9 @@ describe("Dependent filter", () => {
 
         stateFilter.open().selectAttribute(["Connecticut", "Oregon"]).apply();
 
-        cityFilter.open().hasSubtitle("Hartford").hasFilterListSize(10).hasSelectedValueList(["Hartford"]);
+        table.waitLoadStarted().waitLoaded().getColumnValues(2).should("deep.equal", ["Hartford"]);
 
-        table.waitLoaded().getColumnValues(2).should("deep.equal", ["Hartford"]);
+        cityFilter.open().hasSubtitle("Hartford").hasFilterListSize(10).hasSelectedValueList(["Hartford"]);
     });
 
     it("should test parent - child interaction in edit mode", { tags: "pre-merge_isolated_tiger" }, () => {
@@ -156,6 +160,8 @@ describe("Dependent filter", () => {
             ]);
 
         regionFilter.open().selectAttribute(["West Coast"]).apply();
+        table.waitLoadStarted().waitLoaded();
+
         stateFilter
             .open()
             .hasSubtitle("All")
