@@ -1,3 +1,5 @@
+# Myd test
+
 # SDK End-to-end tests
 
 This project contains End-to-End tests for GoodData.UI components.
